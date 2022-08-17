@@ -2,6 +2,7 @@ import math
 import time
 from threading import Thread
 from multiprocessing import Process
+from joblib import Parallel, delayed
 
 
 from tqdm import tqdm
@@ -33,9 +34,9 @@ def calculate_pi():
 def calculate_pi_3000():
 
     for _ in tqdm(range(3000)):
-        calculate_pi()
+        result = calculate_pi()
 
-    return 
+    return result
 
 
 def calculate_serialy(num=7):
@@ -43,11 +44,11 @@ def calculate_serialy(num=7):
     start_time = time.time()
 
     for _ in range(num):
-        calculate_pi_3000()
+        result = calculate_pi_3000()
 
     print('total time:', time.time() - start_time)
     print()
-    return
+    return result
 
 
 def calculate_with_threads(num=7):
@@ -67,6 +68,7 @@ def calculate_with_threads(num=7):
         t.join()
 
     print('total time:', time.time() - start_time)
+    print()
     return 
 
 
@@ -89,3 +91,20 @@ def calculate_with_processes(num=7):
     print('total time:', time.time() - start_time)
     print()
     return 
+
+
+def calculate_with_joblib(num=7):
+
+    start_time = time.time()
+
+    results = Parallel(
+        n_jobs=num, backend='multiprocessing'
+    )(
+        delayed(calculate_pi_3000)() for _ in range(num)
+    )
+
+    print('total time:', time.time() - start_time)
+    print()
+    print(results)
+    return 
+
